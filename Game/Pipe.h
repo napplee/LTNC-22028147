@@ -1,7 +1,5 @@
 #ifndef PIPE_H_INCLUDED
 #define PIPE_H_INCLUDED
-
-
 #include <SDL.h>
 #include "defs.h"
 
@@ -12,7 +10,7 @@ struct Pipe
 
     bool passed;
 
-    Pipe(int x, int height)
+    Pipe(int x, int height, int gap)
     {
         bottom_dst.x = x;
         bottom_dst.y = HEIGHT - height;
@@ -27,7 +25,7 @@ struct Pipe
         top_dst.x = x;
         top_dst.y = 0;
         top_dst.w = PIPE_WIDTH;
-        top_dst.h = HEIGHT - height - PIPE_GAP;
+        top_dst.h = HEIGHT - height - gap;
 
         top_src.x = top_src.y = 0;
         top_src.w = PIPE_WIDTH_SRC;

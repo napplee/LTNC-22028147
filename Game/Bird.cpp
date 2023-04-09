@@ -1,4 +1,5 @@
 #include "Bird.h"
+#include "Game.h"
 #include <bits/stdc++.h>
 using namespace std;
 void Bird::init()
@@ -23,6 +24,11 @@ Bird::Bird(SDL_Texture *up, SDL_Texture *mid, SDL_Texture *down, SDL_Renderer *r
 
 void Bird::update(bool jump, float elapsedTime)
 {
+    if(updateFlag != 2){
+        elapsedTime = 0;
+        updateFlag++;
+        updateFlag %= 3;
+    }
     elapsedTime *= 5;
     if(jump)
     {
@@ -39,6 +45,7 @@ void Bird::update(bool jump, float elapsedTime)
 
     velocity += acceleration * elapsedTime;
     pos.y += velocity * elapsedTime;
+    cout << pos.y<<" " << elapsedTime << endl;
 }
 
 bool Bird::collisionDetector(Pipe *pipe)
@@ -60,9 +67,11 @@ bool Bird::collisionDetector(Pipe *pipe)
     {
         pipe->passed = true;
         score++;
+        isIncreaseNumHeart = false;
+        if(score > 0 && score % 10 == 0){
+            Mix_PlayChannel(-1,newHeart,0);
+        }
         if(pipe->passed == true) Mix_PlayChannel(-1,scoreSound,0);
-        //high_score = max(high_score,score);
-        //cout << high_score << " ";
     }
 
     return false;
@@ -96,4 +105,10 @@ void Bird::animation()
         animationFrames = 0;
         currentRenderingTexture = up;
     }
+}
+void Bird::revive(int coor){
+        pos.y = coor;
+}
+void Bird::updateVelocity(float vel){
+    velocity = vel;
 }

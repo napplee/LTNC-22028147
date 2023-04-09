@@ -17,12 +17,21 @@
 class Game
 {
     public:
+        Bird *bird;
+        bool isStartingTheme = true;
+        bool isStartingThemeFlag = false;
+        bool tempFlag = false;
+        bool isPause = true;
+        int coorRevive = 0;
+        int numHeart = 2;
+        int flag = 0;
         int numberPlayMusic = 0;
         bool firstTime = true;
         int tmpMusic = 0;
+
         Mix_Chunk* music = Mix_LoadWAV("fly.wav");
-        Mix_Music* deadSound = Mix_LoadMUS("crash.wav");
-        Mix_Chunk* backgroundSound = Mix_LoadWAV("ungquachung.mp3");
+        Mix_Chunk* deadSound = Mix_LoadWAV("crash.wav");
+        Mix_Music* backgroundSound = Mix_LoadMUS("ungquachung.mp3");
         int score;
         TTF_Font* font = TTF_OpenFont("font.ttf", 30);
         SDL_Color White = {255, 255, 255};
@@ -46,7 +55,11 @@ class Game
         void render();
         void gameOver();
         void init();
-        void renderHighScore();
+        void renderHighScoreAndHeart();
+        void gamePause();
+        void gameResume();
+        int randomInRange(int x,int y);
+        void renderStartingTheme(bool ok);
 
     private:
         SDL_Renderer *renderer;
@@ -54,7 +67,7 @@ class Game
 
         SDL_Event event;
 
-        Bird *bird;
+
 
         std::list<Pipe*> pipes;
 

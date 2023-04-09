@@ -15,7 +15,7 @@
 #define PIPE_WIDTH 80
 #define PIPE_WIDTH_SRC 52
 #define PIPE_GAP 170
-#define PIPE_DISTANCE 250
+#define PIPE_DISTANCE 300 // 200 -> 350
 #define PIPE_V 3
 
 #define PIPE_MIN_H 150
@@ -23,6 +23,8 @@
 
 #define GROUND_HEIGHT 112
 #define GROUND_WIDTH 336
+#define GAP_MIN 125
+#define GAP_MAX 200
 
 
 #endif // DEFS_H_INCLUDED

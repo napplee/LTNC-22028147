@@ -1,9 +1,9 @@
 # depslib dependency file v1.0
-1679044018 source:d:\napplee07\game\main.cpp
+1681067534 source:d:\napplee07\game\main.cpp
 	"defs.h"
 	"Game.cpp"
 
-1679070895 d:\napplee07\game\game.h
+1681069166 d:\napplee07\game\game.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -17,25 +17,40 @@
 	"Pipe.h"
 	"defs.h"
 
-1679044566 d:\napplee07\game\bird.h
+1681029319 d:\napplee07\game\bird.h
 	<SDL.h>
 	<iostream>
 	<SDL_mixer.h>
 	"Pipe.h"
 	"defs.h"
 
-1679027830 d:\napplee07\game\pipe.h
+1680804948 d:\napplee07\game\pipe.h
 	<SDL.h>
 	"defs.h"
 
-1679027717 d:\napplee07\game\defs.h
+1680805155 d:\napplee07\game\defs.h
 
-1679044602 d:\napplee07\game\bird.cpp
+1681029289 d:\napplee07\game\bird.cpp
 	"Bird.h"
+	"Game.h"
 	<bits/stdc++.h>
 
-1679046485 d:\napplee07\game\game.cpp
+1681069928 d:\napplee07\game\game.cpp
 	"Game.h"
 	"Bird.cpp"
 	<bits/stdc++.h>
+
+1679077967 d:\napplee07\game\heart.h
+
+1681066103 d:\napplee07\game\menu.h
+
+1681066145 d:\napplee07\game\menu.cpp
+	<bits/stdc++.h>
+	<SDL.h>
+	<iostream>
+	<SDL_mixer.h>
+	<SDL_image.h>
+	"menu.h"
+	"defs.h"
+	"Game.h"
 
