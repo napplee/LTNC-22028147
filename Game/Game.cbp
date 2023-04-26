@@ -44,10 +44,13 @@
 		<Unit filename="Game.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="Heart.h">
+		<Unit filename="Pipe.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="Pipe.h">
+		<Unit filename="bestscore.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="bestscore.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="defs.h">
@@ -55,9 +58,6 @@
 		</Unit>
 		<Unit filename="main.cpp" />
 		<Unit filename="menu.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="menu.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Extensions>

@@ -30,7 +30,7 @@ void Game::init()
         pipes.pop_front();
     //cout << randomInRange(300,450) << "\n";
     //randomInRange(100,200) Khoang cach
-    pipes.push_back(new Pipe(WIDTH * 2 + PIPE_DISTANCE, rand() % 301 + 100, randomInRange(GAP_MIN,GAP_MAX)));
+    pipes.push_back(new Pipe(WIDTH * 2 + PIPE_DISTANCE, 200, 200));
     pipes.push_back(new Pipe(pipes.back()->bottom_dst.x + PIPE_DISTANCE, rand() % 301 + 100, randomInRange(GAP_MIN,GAP_MAX)));
     pipes.push_back(new Pipe(pipes.back()->bottom_dst.x + PIPE_DISTANCE, rand() % 301 + 100, randomInRange(GAP_MIN,GAP_MAX)));
 
@@ -42,7 +42,7 @@ void Game::init()
 }
 
 void Game::renderHighScoreAndHeart(){
-    string tmp = "High Score: " + to_string(high_score);
+    string tmp = "Best Score: " + to_string(best.get_bestscore());
     SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, tmp.c_str() , White);
 
     SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
@@ -93,16 +93,25 @@ void Game::renderHighScoreAndHeart(){
     SDL_FreeSurface(surfaceMessage);
     SDL_DestroyTexture(Message);
 }
-void Game::renderStartingTheme(bool ok){
+void Game::renderStartingTheme(bool ok, bool ok2, bool ok3){
+    SDL_RenderClear(renderer);
     SDL_Texture* play = IMG_LoadTexture(renderer,"sprites/play.png");
     SDL_Texture* played = IMG_LoadTexture(renderer,"sprites/played.png");
     SDL_Texture* title = IMG_LoadTexture(renderer,"sprites/title.png");
     SDL_Texture* startingBackground = IMG_LoadTexture(renderer,"sprites/background-day.png");
-    SDL_RenderClear(renderer);
+    SDL_Texture* exit = IMG_LoadTexture(renderer,"sprites/exit.png");
+    SDL_Texture* exited = IMG_LoadTexture(renderer,"sprites/exited.png");
+    SDL_Texture* mixon = IMG_LoadTexture(renderer,"sprites/mix_on.png");
+    SDL_Texture* mixoff = IMG_LoadTexture(renderer,"sprites/mix_off.png");
+
     SDL_RenderCopy(renderer,startingBackground,NULL,NULL);
+    if(ok2 == 0) SDL_RenderCopy(renderer,exit,NULL, new SDL_Rect{WIDTH/2-50,HEIGHT/2 + 100,100,50});
+    if(ok2 == 1) SDL_RenderCopy(renderer,exited,NULL, new SDL_Rect{WIDTH/2-50,HEIGHT/2 + 100,100,50});
     if(ok == 0) SDL_RenderCopy(renderer,play,NULL, new SDL_Rect{WIDTH/2-50,HEIGHT/2,100,50});
     if(ok == 1) SDL_RenderCopy(renderer,played,NULL, new SDL_Rect{WIDTH/2-50,HEIGHT/2,100,50});
     SDL_RenderCopy(renderer,title,NULL,new SDL_Rect{0, 0, WIDTH, HEIGHT/5});
+    if(ok3 == true)SDL_RenderCopy(renderer, mixon, NULL, new SDL_Rect{WIDTH - 50, HEIGHT - 50, 50, 50});
+    if(ok3 == false)SDL_RenderCopy(renderer, mixoff, NULL, new SDL_Rect{WIDTH - 50, HEIGHT - 50, 50, 50});
     SDL_RenderPresent(renderer);
 }
 void Game::Start()
@@ -119,7 +128,6 @@ void Game::Start()
     // main game loop
     while(isRunning)
     {
-
         t1 = t2;
         t2 = chrono::system_clock::now();
 
@@ -129,14 +137,10 @@ void Game::Start()
         while(SDL_PollEvent(&event))
         {
             int x = event.motion.x, y = event.motion.y;
-            if(event.type == SDL_QUIT)
-                {
-                    isRunning = false;
-                }
-            if(isStartingTheme == false) {
+            if(event.type == SDL_QUIT) isRunning = false;
+            if(event.type==SDL_WINDOWEVENT && event.window.event==SDL_WINDOWEVENT_CLOSE) isRunning = false;
+            if(isStartingTheme == false) render();
 
-                    render();
-            }
             if(isStartingTheme == false)
             if((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)||((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP)))
                 {
@@ -146,12 +150,35 @@ void Game::Start()
                     if(firstTime == false) tmpMusic = false;
                     if(firstTime == true && tmpMusic == 1) firstTime = false;
                 }
+            if(isStartingTheme == false)
+            {
+
+                if(gameStarted == true && tmpMusic == 0 && firstTime == true)
+                {
+                    tmpMusic = 1;
+                    if(mixStartingFlag)Mix_PlayMusic(backgroundSound,0);
+                    numberPlayMusic++;
+                    firstTime = false;
+                    //cout << numberPlayMusic << "\n";
+                }
+            }
             if(isStartingTheme == true){
                 if(event.type == SDL_MOUSEBUTTONDOWN && x >= WIDTH/2-50 && x <= WIDTH/2-50 + 100 && y <= HEIGHT/2 + 50 && y >= HEIGHT/2)
                 {
+                    Mix_PlayChannel(-1,clickSound,0);
                     isStartingThemeFlag = true;
                 }
-                renderStartingTheme(isStartingThemeFlag);
+                if(event.type == SDL_MOUSEBUTTONDOWN && x >= WIDTH-50 && x <= WIDTH-50 + 50 && y <= HEIGHT-50 + 50 && y >= HEIGHT-50)
+                {
+                    mixStartingFlag = !mixStartingFlag;
+                }
+                if(event.type ==  SDL_MOUSEBUTTONDOWN && x >= WIDTH/2-50 && x <= WIDTH/2-50 + 100 && y <= HEIGHT/2+ 100 + 50 && y >= HEIGHT/2+ 100)
+                {
+                    Mix_PlayChannel(-1,clickSound,0);
+                    isStartingThemeFlag2 = true;
+                }
+                renderStartingTheme(isStartingThemeFlag,isStartingThemeFlag2, mixStartingFlag);
+                if(isStartingThemeFlag2 == true) isRunning = false;
                 if(isStartingThemeFlag == true && tempFlag == false) {
                         tempFlag = true;
                         SDL_RenderClear(renderer);
@@ -162,18 +189,15 @@ void Game::Start()
 
                 }
             }
-            if(event.key.keysym.sym == SDLK_ESCAPE){
+
+
+
+            if(isStartingTheme == false&& event.key.keysym.sym == SDLK_ESCAPE){
                 gamePause();
             }
         }
         //cout << gameStarted << " " << tmpMusic << " " << firstTime << endl;
-        if(gameStarted == true && tmpMusic == 0 && firstTime == true) {
-                tmpMusic = 1;
-                Mix_PlayMusic(backgroundSound,0);
-                numberPlayMusic++;
-                firstTime = false;
-                //cout << numberPlayMusic << "\n";
-        }
+
 
 
         if(frameDelay > dt.count())
@@ -181,7 +205,12 @@ void Game::Start()
 
         if(gameStarted)
         {
-            if(isPause == false)update(jump, dt.count(), gameover);
+            if(isPause == false){
+                    if(bird->randomE == 1) {
+                            dt = dt * 120 / 100;
+                    }
+                    update(jump, dt.count(), gameover);
+            }
             if(gameover)
                 {
                     gameOver();
@@ -193,25 +222,55 @@ void Game::Start()
 }
 
 void Game::gamePause(){
-
+    renderMenuWhenPause();
     isPause = true;
     Mix_PauseMusic();
     while(isPause)
     {
         while(SDL_PollEvent(&event))
         {
+            int x = event.motion.x, y = event.motion.y;
             if(event.type == SDL_QUIT)
-                isPause = false;
+                {
+                    quitFlag = true;
+                    renderMenuWhenPause();
+                    isPause = false;
+                    isRunning = false;
+                }
+            //back button
+            if(event.type ==  SDL_MOUSEBUTTONDOWN && x >=  WIDTH/2 - 50 && x <= WIDTH/2 + 50 && y <= HEIGHT/2 && y >= HEIGHT/2 - 100)
+                {
+                    backFlag = true;
+                    renderMenuWhenPause();
+                    gameResume();
+                }
 
-            if((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP))
-                gameResume();
+            // quit button
+            if(event.type ==  SDL_MOUSEBUTTONDOWN && x >=  WIDTH/2 - 50 && x <= WIDTH/2 + 50 && y <= HEIGHT/2 + 100&& y >= HEIGHT/2)
+                {
+                    Mix_PlayChannel(-1,clickSound,0);
+                    quitFlag = true;
+                    renderMenuWhenPause();
+                    isRunning = false;
+                    isPause = false;
+                }
+            // mix button
+            if(event.type == SDL_MOUSEBUTTONDOWN && x >= WIDTH-50 && x <= WIDTH-50 + 50 && y <= HEIGHT-50 + 50 && y >= HEIGHT-50)
+                {
+                    mixStartingFlag = !mixStartingFlag;
+                    render();
+                    renderMenuWhenPause();
+                }
+
         }
     }
 }
 void Game::gameResume(){
+    Mix_PlayChannel(-1,clickSound,0);
     isPause = false;
     bird->updateFlag ++;
     Mix_ResumeMusic();
+    backFlag = false;
 }
 void Game::update(bool jump, float elapsedTime, bool &gameover)
 {
@@ -222,7 +281,7 @@ void Game::update(bool jump, float elapsedTime, bool &gameover)
         bird->updateVelocity(0);
         render();
     }
-    int x = 0,coor = 0;
+    int x = 0;
     for(auto p : pipes)
     {
         p->bottom_dst.x -= PIPE_V;
@@ -233,13 +292,30 @@ void Game::update(bool jump, float elapsedTime, bool &gameover)
             pipes.pop_front();
             int dis = randomInRange(150,500);
             pipes.push_back(new Pipe(pipes.back()->bottom_dst.x + dis, rand() % 301 + 100, randomInRange(GAP_MIN,GAP_MAX)));
-            cout << dis<<"\n";
         }
         // increase heart
-        if(bird->collisionDetector(p) == false && bird->isIncreaseNumHeart == false){
-            if(bird->score % 10 == 0 && bird->score > 0) {
+        if(bird->collisionDetector(p) == false){
+            best.update_bestscore(bird->score);
+            if(bird->isIncreaseNumHeart == false)
+            {
+                if(bird->score % 10 == 0 && bird->score > 0) {
                     numHeart++;
+                    Mix_PlayChannel(-1,heartSound, 0);
                     bird->isIncreaseNumHeart = true;
+                }
+            }
+            if(bird->typeEvent == 4){
+                Mix_PlayChannel(-1,heartSound, 0);
+                numHeart++;
+                bird->typeEvent = 0;
+            }
+            if(bird->typeEvent == 3 && bird->backgroundFlag == 0){
+                tex_background = IMG_LoadTexture(renderer, "sprites/background-day.png");
+                bird->typeEvent = 0;
+            }
+            if(bird->typeEvent == 3 && bird->backgroundFlag == 1){
+                bird->typeEvent = 0;
+                tex_background = IMG_LoadTexture(renderer, "sprites/background-night.png");
             }
         }
         if(bird->collisionDetector(p))
@@ -296,8 +372,7 @@ void Game::gameOver()
 {
     gameStarted = false;
     Mix_PlayChannel(-1,deadSound,0);
-    SDL_RenderCopy(renderer, tex_gameover, NULL, new SDL_Rect{WIDTH / 2 - 96, HEIGHT / 3, 192, 42});
-    SDL_RenderPresent(renderer);
+    renderScoreGameOver();
 
     if(gameStarted == false) Mix_HaltMusic();
     SDL_Delay(1000);
@@ -322,6 +397,7 @@ void Game::gameOver()
     //cout << high_score << "\n";
     if(playagain)
         {
+            bird->randomE = 0;
             numHeart = 2;
             tmpMusic = 0;
             firstTime = true;
@@ -342,6 +418,8 @@ void Game::render()
 
     // background
     SDL_RenderCopy(renderer, tex_background, NULL, NULL);
+    SDL_Texture *mess = IMG_LoadTexture(renderer,"sprites/mess.png");
+    if(isStartingTheme == false && bird->score == 0) SDL_RenderCopy(renderer,mess,NULL,new SDL_Rect{WIDTH/2 - 100,HEIGHT/2 - 50,200,100});
 
     // pipes
     for(auto pipe : pipes)
@@ -373,12 +451,13 @@ void Game::loadTextures()
 {
     tex_background = IMG_LoadTexture(renderer, "sprites/background-day.png");
     tex_pipe = IMG_LoadTexture(renderer, "sprites/pipe.png");
-    tex_playerMid = IMG_LoadTexture(renderer, "sprites/yellowbird-midflap.png");
-    tex_playerUp = IMG_LoadTexture(renderer, "sprites/yellowbird-upflap.png");
-    tex_playerDown = IMG_LoadTexture(renderer, "sprites/yellowbird-downflap.png");
+    tex_playerMid = IMG_LoadTexture(renderer, "sprites/bird_red_0.png");
+    tex_playerUp = IMG_LoadTexture(renderer, "sprites/bird_red_1.png");
+    tex_playerDown = IMG_LoadTexture(renderer, "sprites/bird_red_2.png");
+
     tex_ground = IMG_LoadTexture(renderer, "sprites/base.png");
     tex_gameover = IMG_LoadTexture(renderer, "sprites/gameover.png");
-
+    scoreGameOver = IMG_LoadTexture(renderer,"sprites/score.png");
 
     for(int i = 0; i < 10; i++)
     {
@@ -390,4 +469,65 @@ void Game::loadTextures()
 void Game::Close()
 {
     SDL_Quit();
+}
+void Game::renderMenuWhenPause(){
+    int menux = WIDTH/2 - 200, menuy = HEIGHT/2 - 200, menuWidth = 400, menuHeight = 400;
+    SDL_Texture* menu = IMG_LoadTexture(renderer,"sprites/menu.png");
+    SDL_Texture* quit = IMG_LoadTexture(renderer,"sprites/quit.png");
+    SDL_Texture* quited = IMG_LoadTexture(renderer,"sprites/quited.png");
+    SDL_Texture* backed = IMG_LoadTexture(renderer,"sprites/backed.png");
+    SDL_Texture* backk = IMG_LoadTexture(renderer,"sprites/back.png");
+    SDL_Texture* mixon = IMG_LoadTexture(renderer,"sprites/mix_on.png");
+    SDL_Texture* mixoff = IMG_LoadTexture(renderer,"sprites/mix_off.png");
+
+
+    SDL_RenderCopy(renderer,menu,NULL,new SDL_Rect{menux, menuy, menuWidth, menuHeight});
+    if(quitFlag == false)SDL_RenderCopy(renderer,quit,NULL,new SDL_Rect{menux + 150, menuy + 200, 100, 100});
+    else SDL_RenderCopy(renderer,quited,NULL,new SDL_Rect{menux + 150, menuy + 200, 100, 100});
+    if(backFlag == false)SDL_RenderCopy(renderer,backk,NULL,new SDL_Rect{menux + 150, menuy + 100, 100, 100});
+    else SDL_RenderCopy(renderer,backed,NULL,new SDL_Rect{menux + 150, menuy + 100, 100, 100});
+    if(mixStartingFlag == true){
+            SDL_DestroyTexture(mixoff);
+            SDL_RenderCopy(renderer, mixon, NULL, new SDL_Rect{WIDTH - 50, HEIGHT - 50, 50, 50});
+    }
+    if(mixStartingFlag == false){
+            SDL_DestroyTexture(mixon);
+            SDL_RenderCopy(renderer, mixoff, NULL, new SDL_Rect{WIDTH - 50, HEIGHT - 50, 50, 50});
+    }
+    SDL_RenderPresent(renderer);
+}
+// 1: tang trong luong
+void Game::renderScoreGameOver(){
+    SDL_RenderCopy(renderer, tex_gameover, NULL, new SDL_Rect{WIDTH / 2 - 96, HEIGHT / 3 - 20, 192, 42});
+    int x = WIDTH / 2 - 96 - 60, y = HEIGHT / 3 -20 + 42 + 25, width = 192 + 120, height = 160;
+    SDL_RenderCopy(renderer,scoreGameOver,NULL,new SDL_Rect{x, y, width, height});
+
+    string tmp = to_string(best.get_bestscore());
+    SDL_Surface* surfaceScoreMessage = TTF_RenderText_Solid(font, tmp.c_str() , White);
+
+    SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceScoreMessage);
+
+    SDL_Rect score_rect;
+    score_rect.x = x + width/2 + 55;
+    score_rect.y = y + height/2 - 35;
+    score_rect.w = surfaceScoreMessage->w;
+    score_rect.h = surfaceScoreMessage->h;
+    SDL_RenderCopy(renderer, Message, NULL, &score_rect);
+
+
+    //cout << bird->score << endl;
+    string score = to_string(bird->score);
+
+    SDL_Surface* surfaceBirdScoreMessage = TTF_RenderText_Solid(font, score.c_str() , White);
+
+    SDL_Texture* BirdScoreMessage = SDL_CreateTextureFromSurface(renderer, surfaceBirdScoreMessage);
+
+    SDL_Rect BirdScore_rect;
+    BirdScore_rect.x = x + width/2 -55;
+    BirdScore_rect.y = y + height/2 - 35;
+    BirdScore_rect.w = surfaceBirdScoreMessage->w;
+    BirdScore_rect.h = surfaceBirdScoreMessage->h;
+    SDL_RenderCopy(renderer, BirdScoreMessage, NULL, &BirdScore_rect);
+
+    SDL_RenderPresent(renderer);
 }

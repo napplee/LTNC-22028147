@@ -25,6 +25,11 @@ class Bird
 
 
     public:
+        int backgroundFlag = 0;
+        int typeEvent = 0;
+        int randomE = 0;
+        int currentEventPoint = 0;
+        int oldVel=0;
         int score;
         int updateFlag = 0;
         bool isIncreaseNumHeart = false;
@@ -44,6 +49,10 @@ class Bird
         void updateWhenRevive(int posY);
         int getPosY(Bird bird);
         void updateVelocity(float vel);
+        bool checkIsPassedForEvent(Pipe *pipe);
+        void randomEvent();
+        int randomInRangeBird(int x,int y);
+        void solveEvent1();
 };
 
 #endif // BIRD_H_INCLUDED

@@ -3,7 +3,7 @@
 	"defs.h"
 	"Game.cpp"
 
-1681069166 d:\napplee07\game\game.h
+1682477910 d:\napplee07\game\game.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -13,11 +13,12 @@
 	<random>
 	<time.h>
 	<string>
+	"bestscore.cpp"
 	"Bird.h"
 	"Pipe.h"
 	"defs.h"
 
-1681029319 d:\napplee07\game\bird.h
+1682224373 d:\napplee07\game\bird.h
 	<SDL.h>
 	<iostream>
 	<SDL_mixer.h>
@@ -28,14 +29,18 @@
 	<SDL.h>
 	"defs.h"
 
-1680805155 d:\napplee07\game\defs.h
+1682218328 d:\napplee07\game\defs.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
 
-1681029289 d:\napplee07\game\bird.cpp
+1682477843 d:\napplee07\game\bird.cpp
 	"Bird.h"
 	"Game.h"
 	<bits/stdc++.h>
 
-1681069928 d:\napplee07\game\game.cpp
+1682477762 d:\napplee07\game\game.cpp
 	"Game.h"
 	"Bird.cpp"
 	<bits/stdc++.h>
@@ -53,4 +58,10 @@
 	"menu.h"
 	"defs.h"
 	"Game.h"
+
+1682353645 d:\napplee07\game\bestscore.cpp
+	"bestscore.h"
+
+1682353583 d:\napplee07\game\bestscore.h
+	<bits/stdc++.h>
 

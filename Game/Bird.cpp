@@ -45,7 +45,6 @@ void Bird::update(bool jump, float elapsedTime)
 
     velocity += acceleration * elapsedTime;
     pos.y += velocity * elapsedTime;
-    cout << pos.y<<" " << elapsedTime << endl;
 }
 
 bool Bird::collisionDetector(Pipe *pipe)
@@ -65,6 +64,8 @@ bool Bird::collisionDetector(Pipe *pipe)
 
     if(!pipe->passed && pipe->top_dst.x + PIPE_WIDTH < pos.x)
     {
+        solveEvent1();
+        randomEvent();
         pipe->passed = true;
         score++;
         isIncreaseNumHeart = false;
@@ -110,5 +111,66 @@ void Bird::revive(int coor){
         pos.y = coor;
 }
 void Bird::updateVelocity(float vel){
-    velocity = vel;
+     velocity = vel;
+}
+bool Bird::checkIsPassedForEvent(Pipe *pipe){
+    if(!pipe->passed && pipe->top_dst.x + PIPE_WIDTH < pos.x) return true;
+    return false;
+}
+void Bird::randomEvent(){
+    if(score >= currentEventPoint + 2){
+        int percent = randomInRangeBird(1,100);
+        //cout << percent << endl;
+        if(percent <= 25){
+            typeEvent = 1;
+            currentEventPoint = score;
+            randomE = randomInRangeBird(1,2);
+        }
+        // event 2
+        if(percent <= 100 && percent >= 70){
+            typeEvent = 2;
+            currentEventPoint = score;
+            randomE = randomInRangeBird(1,3);
+            SDL_Texture *upB;
+            SDL_Texture *downB;
+            SDL_Texture *midB;
+            if(randomE == 1){
+                midB = IMG_LoadTexture(renderer, "sprites/bird_orange_0.png");
+                upB = IMG_LoadTexture(renderer, "sprites/bird_orange_1.png");
+                downB = IMG_LoadTexture(renderer, "sprites/bird_orange_2.png");
+            }
+            if(randomE == 2){
+                midB = IMG_LoadTexture(renderer, "sprites/bird_blue_0.png");
+                upB = IMG_LoadTexture(renderer, "sprites/bird_blue_1.png");
+                downB = IMG_LoadTexture(renderer, "sprites/bird_blue_2.png");
+            }
+            if(randomE == 3){
+                midB = IMG_LoadTexture(renderer, "sprites/bird_red_0.png");
+                upB = IMG_LoadTexture(renderer, "sprites/bird_red_1.png");
+                downB = IMG_LoadTexture(renderer, "sprites/bird_red_2.png");
+            }
+            randomE = 0;
+            up = upB;
+            mid = midB;
+            down = downB;
+        }
+        if(percent <= 69 && percent >= 40){
+            typeEvent = 3;
+            backgroundFlag = 1 - backgroundFlag;
+            typeEvent = 0;
+        }
+        if(percent < 40 && percent >= 35){
+            typeEvent = 4;
+        }
+    }
+}
+int Bird::randomInRangeBird(int x,int y){
+
+    return x + (rand() % (y-x));
+}
+void Bird::solveEvent1(){
+    if(score > currentEventPoint + 1){
+        if(typeEvent == 1) updateVelocity(oldVel);
+        randomE = 0;
+    }
 }
